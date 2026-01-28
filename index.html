@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finvest | Crypto Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons CDN -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #F8F9FD;
+            color: #1A1D1F;
+        }
+
+        .primary-purple {
+            background-color: #6C5DD3;
+        }
+
+        .text-purple {
+            color: #6C5DD3;
+        }
+
+        .bg-purple-light {
+            background-color: rgba(108, 93, 211, 0.1);
+        }
+
+        .sidebar-item-active {
+            background-color: #6C5DD3 !important;
+            color: white !important;
+            box-shadow: 0 4px 14px rgba(108, 93, 211, 0.4);
+        }
+
+        /* Toast Animation */
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #E8E8E8;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #D1D1D1;
+        }
+
+        /* Dropdown transition */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 0.5rem;
+            background: white;
+            border: 1px solid #F3F4F6;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            border-radius: 1rem;
+            z-index: 50;
+            min-width: 200px;
+        }
+
+        .dropdown-menu.active {
+            display: block;
+        }
+
+        /* Page Transitions */
+        .page-content {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6C5DD3',
+                        surface: '#F8F9FD',
+                        dark: '#1A1D1F',
+                    },
+                    borderRadius: {
+                        '3xl': '1.5rem',
+                        '4xl': '2rem',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed top-8 right-8 z-[100] flex flex-col gap-3"></div>
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r border-gray-100 flex flex-col fixed h-full z-10">
+        <div class="p-8 flex items-center gap-3 cursor-pointer" onclick="navigateTo('home')">
+            <div class="w-10 h-10 primary-purple rounded-xl flex items-center justify-center shadow-lg">
+                <i class="ph-bold ph-lightning text-white text-2xl"></i>
+            </div>
+            <span class="text-2xl font-bold tracking-tight">Finvest</span>
+        </div>
+
+        <nav id="sidebar-nav" class="flex-1 px-4 mt-4 space-y-2">
+            <a href="#" onclick="navigateTo('home')" id="nav-home"
+                class="sidebar-item-active sidebar-nav-item flex items-center gap-4 px-4 py-4 rounded-2xl transition-all">
+                <i class="ph-fill ph-house text-xl"></i>
+                <span class="font-semibold">Home</span>
+            </a>
+            <a href="#" onclick="navigateTo('assets')" id="nav-assets"
+                class="sidebar-nav-item flex items-center gap-4 px-4 py-4 rounded-2xl text-gray-400 hover:text-primary transition-all group">
+                <i class="ph-bold ph-wallet text-xl group-hover:text-primary"></i>
+                <span class="font-semibold">Assets</span>
+            </a>
+            <a href="#" onclick="navigateTo('market')" id="nav-market"
+                class="sidebar-nav-item flex items-center gap-4 px-4 py-4 rounded-2xl text-gray-400 hover:text-primary transition-all group">
+                <i class="ph-bold ph-chart-line-up text-xl group-hover:text-primary"></i>
+                <span class="font-semibold">Market</span>
+            </a>
+            <a href="#" onclick="navigateTo('transactions')" id="nav-transactions"
+                class="sidebar-nav-item flex items-center gap-4 px-4 py-4 rounded-2xl text-gray-400 hover:text-primary transition-all group">
+                <i class="ph-bold ph-swap text-xl group-hover:text-primary"></i>
+                <span class="font-semibold">Transactions</span>
+            </a>
+            <a href="#" onclick="navigateTo('settings')" id="nav-settings"
+                class="sidebar-nav-item flex items-center gap-4 px-4 py-4 rounded-2xl text-gray-400 hover:text-primary transition-all group">
+                <i class="ph-bold ph-gear text-xl group-hover:text-primary"></i>
+                <span class="font-semibold">Settings</span>
+            </a>
+        </nav>
+
+        <div class="p-6 mt-auto">
+            <button onclick="focusSwap()"
+                class="w-full primary-purple text-white py-4 rounded-2xl font-bold shadow-lg shadow-purple-200 hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+                <i class="ph-bold ph-plus"></i>
+                Swap Crypto
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <!-- Main Content Area -->
+    <div id="main-content-wrapper" class="ml-64 mr-96 flex-1 flex flex-col h-full bg-[#F8F9FD]">
+        <!-- Header (Fixed at top) -->
+        <header class="p-10 pb-0 flex justify-between items-center z-20">
+            <div>
+                <h1 id="page-title" class="text-3xl font-bold mb-1">Dashboard</h1>
+                <p id="page-subtitle" class="text-gray-400 font-medium">Welcome back, John Doe</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <!-- Notifications -->
+                <div class="relative">
+                    <button id="notif-btn"
+                        class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-gray-400 border border-gray-100 hover:shadow-md transition-shadow">
+                        <i class="ph-bold ph-bell-simple text-xl"></i>
+                    </button>
+                    <div id="notif-dropdown" class="dropdown-menu p-4">
+                        <h4 class="font-bold border-b pb-2 mb-3">Notifications</h4>
+                        <div class="space-y-3">
+                            <div class="text-xs p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                <p class="font-bold">Price Alert: BTC</p>
+                                <p class="text-gray-400">Bitcoin reached $45k!</p>
+                            </div>
+                            <div class="text-xs p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
+                                <p class="font-bold">Security Login</p>
+                                <p class="text-gray-400">New login from Chrome/Windows</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile -->
+                <div class="relative">
+                    <div id="profile-btn"
+                        class="flex items-center gap-3 bg-white pl-2 pr-4 py-2 rounded-2xl border border-gray-100 cursor-pointer hover:shadow-md transition-shadow">
+                        <img src="https://ui-avatars.com/api/?name=John+Doe&background=6C5DD3&color=fff" alt="User"
+                            class="w-10 h-10 rounded-xl">
+                        <span class="font-bold text-sm">John D.</span>
+                        <i class="ph-bold ph-caret-down text-xs text-gray-400"></i>
+                    </div>
+                    <div id="profile-dropdown" class="dropdown-menu">
+                        <a href="#" onclick="navigateTo('settings')"
+                            class="block px-6 py-3 hover:bg-gray-50 text-sm font-semibold rounded-t-2xl">My Account</a>
+                        <a href="#" onclick="navigateTo('settings')"
+                            class="block px-6 py-3 hover:bg-gray-50 text-sm font-semibold">Security</a>
+                        <a href="#" onclick="signOut()"
+                            class="block px-6 py-3 hover:bg-gray-50 text-sm font-semibold border-t text-rose-500 rounded-b-2xl">
+                            Sign Out
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Content Area -->
+        <main id="main-scroll-area" class="flex-1 overflow-y-auto p-10 pt-8">
+            <div id="view-container">
+                <!-- Content will be injected here -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Right Column (Widgets) - Always Visible for Home, hidden contextually if needed -->
+    <aside id="right-widget-column"
+        class="w-96 bg-white border-l border-gray-100 fixed right-0 h-full p-10 overflow-y-auto">
+        <!-- Sell Crypto Widget -->
+        <div class="bg-gray-50 rounded-[2.5rem] p-8 mb-8 border border-gray-100 shadow-sm">
+            <h3 class="text-xl font-bold mb-8">Sell Crypto</h3>
+
+            <div class="space-y-6">
+                <!-- From -->
+                <div>
+                    <label class="text-xs text-gray-400 font-bold uppercase block mb-3 pl-1">You Sell</label>
+                    <div
+                        class="bg-white p-4 rounded-3xl border border-gray-200 flex items-center justify-between focus-within:border-primary transition-colors">
+                        <div class="flex items-center gap-3">
+                            <div id="sell-icon"
+                                class="w-10 h-10 bg-emerald-50 flex items-center justify-center rounded-2xl">
+                                <i class="ph-fill ph-currency-dollar text-emerald-500 text-xl"></i>
+                            </div>
+                            <span id="sell-currency" class="font-bold">USDT</span>
+                        </div>
+                        <input id="sell-input" type="number" value="1000"
+                            class="w-24 text-right font-extrabold outline-none bg-transparent">
+                    </div>
+                </div>
+
+                <!-- Swap Icon -->
+                <div class="flex justify-center -my-3 relative z-10">
+                    <button id="swap-btn"
+                        class="w-10 h-10 bg-white border border-gray-100 rounded-xl flex items-center justify-center shadow-lg cursor-pointer hover:rotate-180 transition-transform duration-500">
+                        <i class="ph-bold ph-arrows-down-up text-primary"></i>
+                    </button>
+                </div>
+
+                <!-- To -->
+                <div class="mt-0">
+                    <label class="text-xs text-gray-400 font-bold uppercase block mb-3 pl-1">You Receive</label>
+                    <div class="bg-white p-4 rounded-3xl border border-gray-200 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div id="receive-icon"
+                                class="w-10 h-10 bg-purple-50 flex items-center justify-center rounded-2xl">
+                                <i class="ph-fill ph-currency-eth text-purple-500 text-xl"></i>
+                            </div>
+                            <span id="receive-currency" class="font-bold">ETH</span>
+                        </div>
+                        <input id="receive-input" type="number" readonly value="0.45"
+                            class="w-24 text-right font-extrabold outline-none bg-transparent text-gray-500">
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button id="main-swap-action"
+                        class="w-full primary-purple text-white py-5 rounded-3xl font-extrabold shadow-xl shadow-purple-100 hover:opacity-95 transition-all active:scale-95">
+                        Swap Now
+                    </button>
+                    <p class="text-center text-[10px] text-gray-400 mt-4 font-bold uppercase tracking-widest">Minimal
+                        swap amount: 50 USDT</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rewards Card -->
+        <div
+            class="primary-purple rounded-[2.5rem] p-8 text-white relative overflow-hidden group cursor-pointer shadow-lg hover:shadow-purple-200 transition-all">
+            <i
+                class="ph-fill ph-gift absolute -right-4 -bottom-4 text-9xl opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
+            <h3 class="text-xl font-bold mb-2">Refer & Earn</h3>
+            <p class="text-purple-100 text-sm mb-6 leading-relaxed">Invite your friends and get 15% of their trading
+                fees.</p>
+            <button onclick="copyInviteLink()"
+                class="bg-white text-primary w-full py-4 rounded-2xl font-bold hover:bg-opacity-90 transition-colors">
+                Get Invite Link
+            </button>
+        </div>
+
+        <!-- Market Stats Widget -->
+        <div class="mt-10 bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm">
+            <div class="flex items-center justify-between mb-6">
+                <h4 class="font-bold">Market Stats</h4>
+                <i class="ph-bold ph-dots-three-outline font-bold text-gray-400 cursor-pointer"></i>
+            </div>
+            <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-400 text-sm font-medium">Market Cap</span>
+                    <span class="font-bold">$2.1T</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-400 text-sm font-medium">24h Vol</span>
+                    <span class="font-bold">$84.5B</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-400 text-sm font-medium">BTC Dominance</span>
+                    <span class="font-bold">51.2%</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <script>
+        // --- State/Data ---
+        const state = {
+            currentView: 'home',
+            currentSettingsTab: 'Profile',
+            balance: 69880,
+            assets: [
+                { name: 'Bitcoin', symbol: 'BTC', amount: '1.450', price: 42350, change: '+1.24%', up: true, icon: 'ph-currency-btc', color: 'orange-500', bg: 'orange-50' },
+                { name: 'Ethereum', symbol: 'ETH', amount: '12.80', price: 2210.50, change: '-0.45%', up: false, icon: 'ph-currency-eth', color: 'purple-500', bg: 'purple-50' },
+                { name: 'Solana', symbol: 'SOL', amount: '150.2', price: 94.50, change: '+8.7%', up: true, icon: 'ph-currency-sol', color: 'blue-500', bg: 'blue-50' },
+                { name: 'USDT', symbol: 'USDT', amount: '5420.0', price: 1.00, change: '+0.01%', up: true, icon: 'ph-currency-dollar', color: 'emerald-500', bg: 'emerald-50' }
+            ],
+            marketCoins: [
+                { name: 'Bitcoin', symbol: 'BTC', price: '$42,350', change: '+2.4%', up: true, cap: '$820.4B' },
+                { name: 'Ethereum', symbol: 'ETH', price: '$2,210', change: '-1.2%', up: false, cap: '$265.1B' },
+                { name: 'Tether', symbol: 'USDT', price: '$1.00', change: '+0.01%', up: true, cap: '$94.2B' },
+                { name: 'Solana', symbol: 'SOL', price: '$94.50', change: '+8.7%', up: true, cap: '$40.8B' },
+                { name: 'Cardano', symbol: 'ADA', price: '$0.52', change: '-3.2%', up: false, cap: '$18.2B' }
+            ],
+            transactions: [
+                { type: 'Received', asset: 'BTC', date: 'Jan 18, 2024', amount: '+0.005', fiat: '$211.75', status: 'Completed' },
+                { type: 'Sent', asset: 'ETH', date: 'Jan 17, 2024', amount: '-1.20', fiat: '$2,652.60', status: 'Completed' },
+                { type: 'Received', asset: 'SOL', date: 'Jan 16, 2024', amount: '+5.0', fiat: '$472.50', status: 'Completed' }
+            ],
+            marketFilter: 'All',
+            transactionFilter: 'All',
+            transactionSearch: '',
+            swapState: {
+                from: 'USDT',
+                to: 'ETH',
+                rate: 0.00045,
+                isUsdtToEth: true
+            }
+        };
+
+        const views = {
+            home: {
+                title: 'Dashboard',
+                subtitle: 'Welcome back, John Doe',
+                render: () => `
+                    <div class="page-content">
+                        <!-- Balance Card -->
+                        <section class="bg-white rounded-[2.5rem] p-10 mb-10 border border-gray-50 flex justify-between items-center shadow-sm relative overflow-hidden group">
+                            <div class="relative z-10">
+                                <span class="text-gray-400 font-semibold mb-4 block uppercase tracking-wider text-xs">Total Balance</span>
+                                <div class="flex items-baseline gap-2 mb-6">
+                                    <span class="text-5xl font-extrabold tracking-tight">$${state.balance.toLocaleString()}</span>
+                                    <span class="text-emerald-500 font-bold bg-emerald-50 px-3 py-1 rounded-full text-sm">+2.5%</span>
+                                </div>
+                                <div class="flex gap-4">
+                                    <button onclick="simulateDeposit()" class="primary-purple text-white px-8 py-3 rounded-2xl font-bold shadow-md hover:opacity-90 transition-opacity">Deposit</button>
+                                    <button onclick="showToast('Please verify your 2FA to withdraw.', 'warning')" class="bg-gray-100 text-gray-700 px-8 py-3 rounded-2xl font-bold hover:bg-gray-200 transition-colors">Withdraw</button>
+                                </div>
+                            </div>
+                            <div class="w-1/2 h-32 relative z-10">
+                                <svg viewBox="0 0 400 100" class="w-full h-full drop-shadow-xl">
+                                    <defs>
+                                        <linearGradient id="gradientHome" x1="0%" y1="0%" x2="0%" y2="100%">
+                                            <stop offset="0%" stop-color="#6C5DD3" stop-opacity="0.2" />
+                                            <stop offset="100%" stop-color="#6C5DD3" stop-opacity="0" />
+                                        </linearGradient>
+                                    </defs>
+                                    <path id="home-chart-path" d="M0,80 Q50,20 100,50 T200,30 T300,70 T400,10" fill="none" stroke="#6C5DD3" stroke-width="4" stroke-linecap="round" />
+                                    <path d="M0,80 Q50,20 100,50 T200,30 T300,70 T400,10 L400,100 L0,100 Z" fill="url(#gradientHome)" />
+                                </svg>
+                            </div>
+                        </section>
+                        
+                        <!-- Portfolio Cards -->
+                        <div class="grid grid-cols-2 gap-8 mb-10">
+                            ${state.assets.slice(0, 2).map(asset => `
+                                <div class="bg-white p-8 rounded-[2.5rem] border border-gray-50 shadow-sm hover:shadow-md transition-all cursor-pointer">
+                                    <div class="flex justify-between items-center mb-8">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-12 h-12 bg-${asset.bg} rounded-2xl flex items-center justify-center"><i class="ph-fill ${asset.icon} text-${asset.color} text-2xl"></i></div>
+                                            <div><h3 class="font-bold">${asset.name}</h3><span class="text-xs text-gray-400 font-bold uppercase">${asset.symbol}</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-between items-end">
+                                        <div><span class="text-2xl font-extrabold block">$${asset.price.toLocaleString()}</span><span class="font-bold text-sm ${asset.up ? 'text-emerald-500' : 'text-rose-500'}">${asset.change}</span></div>
+                                        <div class="w-24"><svg viewBox="0 0 100 40" class="w-full"><path d="M0,${asset.up ? '30 L20,25 L40,35 L60,15 L80,20 L100,5' : '10 L20,15 L40,5 L60,25 L80,20 L100,35'}" fill="none" stroke="${asset.up ? '#10b981' : '#f43f5e'}" stroke-width="3" stroke-linecap="round" /></svg></div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <!-- Recent Transactions -->
+                        <section class="bg-white rounded-[2.5rem] p-10 border border-gray-50 shadow-sm">
+                            <div class="flex justify-between items-center mb-8">
+                                <h2 class="text-xl font-bold">Recent Transactions</h2>
+                                <button onclick="navigateTo('transactions')" class="text-primary font-bold text-sm hover:underline">View All</button>
+                            </div>
+                            <div id="home-transaction-list" class="space-y-6">
+                                ${state.transactions.slice(0, 3).map((txn, i) => `
+                                    <div class="flex items-center justify-between py-2 ${i > 0 ? 'border-t border-gray-50 pt-6' : ''}">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-12 h-12 ${txn.type === 'Received' || (txn.type === 'Swap' && txn.amount.startsWith('+')) ? 'bg-emerald-50 text-emerald-500' : 'bg-gray-100 text-gray-500'} rounded-2xl flex items-center justify-center">
+                                                <i class="ph-bold ph-arrow-${txn.type === 'Received' || (txn.type === 'Swap' && txn.amount.startsWith('+')) ? 'down-left' : 'up-right'} text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-bold">${txn.type} ${txn.asset}</h4>
+                                                <span class="text-xs text-gray-400 font-bold">${txn.date}</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <span class="block font-extrabold ${txn.amount.startsWith('+') ? 'text-emerald-500' : 'text-dark'}">${txn.amount} ${txn.asset}</span>
+                                            <span class="text-xs text-gray-400 font-bold">${txn.fiat}</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </section>
+                    </div>
+                `
+            },
+            assets: {
+                title: 'My Assets',
+                subtitle: 'Manage and monitor your crypto holdings',
+                render: () => `
+                    <div class="page-content">
+                        <div class="grid grid-cols-3 gap-8 mb-10">
+                            <div class="bg-white p-8 rounded-4xl border border-gray-50 shadow-sm">
+                                <span class="text-gray-400 font-bold text-xs uppercase mb-2 block">Net Worth</span>
+                                <h3 class="text-3xl font-extrabold mb-4">$${state.assets.reduce((acc, curr) => acc + (parseFloat(curr.amount) * curr.price), 0).toLocaleString()}</h3>
+                                <p class="text-emerald-500 font-bold text-sm">+$1,240.50 (24h)</p>
+                            </div>
+                            <div class="bg-white p-8 rounded-4xl border border-gray-50 shadow-sm">
+                                <span class="text-gray-400 font-bold text-xs uppercase mb-2 block">Total Profit</span>
+                                <h3 class="text-3xl font-extrabold mb-4">$${(state.assets.reduce((acc, curr) => acc + (parseFloat(curr.amount) * curr.price), 0) * 0.18).toLocaleString()}</h3>
+                                <p class="text-emerald-500 font-bold text-sm">+18.0% (All time)</p>
+                            </div>
+                            <div class="bg-white p-8 rounded-4xl border border-gray-50 shadow-sm">
+                                <span class="text-gray-400 font-bold text-xs uppercase mb-2 block">Assets Held</span>
+                                <h3 class="text-3xl font-extrabold mb-4">${state.assets.length} Coins</h3>
+                                <p class="text-primary font-bold text-sm">Diversified portfolio</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-[2.5rem] p-10 border border-gray-50 shadow-sm">
+                            <h2 class="text-xl font-bold mb-8">Asset Breakdown</h2>
+                            <div class="space-y-8">
+                                ${state.assets.map(asset => `
+                                    <div class="flex items-center justify-between group cursor-pointer hover:translate-x-1 transition-transform">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-14 h-14 bg-${asset.bg} rounded-2xl flex items-center justify-center group-hover:bg-primary/5 transition-colors">
+                                                <i class="ph-fill ${asset.icon} text-2xl text-${asset.color}"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="font-extrabold text-lg">${asset.name}</h4>
+                                                <span class="text-xs text-gray-400 font-bold uppercase">${asset.symbol}</span>
+                                            </div>
+                                        </div>
+                                        <div class="flex gap-20 items-center">
+                                            <div class="text-right">
+                                                <span class="block font-extrabold">${asset.amount} ${asset.symbol}</span>
+                                                <span class="text-xs text-gray-400 font-bold">$${(parseFloat(asset.amount) * asset.price).toLocaleString()}</span>
+                                            </div>
+                                            <div class="w-32 h-10">
+                                                <svg viewBox="0 0 100 40" class="w-full h-full">
+                                                    <path d="M0,${20 + Math.random() * 10} L20,${15 + Math.random() * 15} L40,${25 + Math.random() * 5} L60,${10 + Math.random() * 20} L80,${20 + Math.random() * 10} L100,5" fill="none" stroke="#6C5DD3" stroke-width="3" stroke-linecap="round" />
+                                                </svg>
+                                            </div>
+                                            <button onclick="navigateTo('market')" class="text-primary font-bold border border-primary/20 px-6 py-2 rounded-xl hover:bg-primary hover:text-white transition-all">Details</button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            market: {
+                title: 'Market Trends',
+                subtitle: 'Get live insights from the crypto market',
+                render: () => `
+                    <div class="page-content">
+                        <div class="flex gap-4 mb-10 overflow-x-auto pb-4">
+                            ${['All', 'Favorites', 'Layer 1', 'DeFi', 'NFTs', 'GameFi'].map((cat) => `
+                                <button onclick="filterMarket('${cat}')" class="${state.marketFilter === cat ? 'bg-primary text-white' : 'bg-white text-gray-500'} px-8 py-3 rounded-2xl font-bold border border-gray-100 whitespace-nowrap shadow-sm hover:shadow-md transition-all">${cat}</button>
+                            `).join('')}
+                        </div>
+
+                        <div class="bg-white rounded-[2.5rem] overflow-hidden border border-gray-50 shadow-sm">
+                            <table class="w-full text-left">
+                                <thead class="bg-gray-50 border-b border-gray-100">
+                                    <tr>
+                                        <th class="px-10 py-6 font-bold text-gray-400 text-xs uppercase">Coin</th>
+                                        <th class="px-10 py-6 font-bold text-gray-400 text-xs uppercase">Price</th>
+                                        <th class="px-10 py-6 font-bold text-gray-400 text-xs uppercase">24h Change</th>
+                                        <th class="px-10 py-6 font-bold text-gray-400 text-xs uppercase">Market Cap</th>
+                                        <th class="px-10 py-6 font-bold text-gray-400 text-xs uppercase">Trade</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${state.marketCoins.filter(c => state.marketFilter === 'All' || Math.random() > 0.5).map(coin => `
+                                        <tr class="hover:bg-gray-50/50 transition-colors border-b border-gray-50 last:border-0 group">
+                                            <td class="px-10 py-6">
+                                                <div class="flex items-center gap-4">
+                                                    <div class="w-10 h-10 bg-primary/10 flex items-center justify-center rounded-xl group-hover:bg-primary group-hover:text-white transition-all"><i class="ph-bold ph-lightning"></i></div>
+                                                    <div><p class="font-extrabold">${coin.name}</p><p class="text-xs text-gray-400">${coin.symbol}</p></div>
+                                                </div>
+                                            </td>
+                                            <td class="px-10 py-6"><span class="font-bold">${coin.price}</span></td>
+                                            <td class="px-10 py-6"><span class="font-bold ${coin.up ? 'text-emerald-500' : 'text-rose-500'}">${coin.change}</span></td>
+                                            <td class="px-10 py-6"><span class="font-bold text-gray-500">${coin.cap}</span></td>
+                                            <td class="px-10 py-6"><button onclick="buyCrypto('${coin.symbol}')" class="primary-purple text-white px-6 py-2 rounded-xl font-bold shadow-md hover:bg-opacity-90 active:scale-95 transition-all">Buy</button></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `
+            },
+            transactions: {
+                title: 'Transactions',
+                subtitle: 'History of all your crypto activities',
+                render: () => `
+                    <div class="page-content">
+                        <div class="bg-white rounded-[2.5rem] p-10 border border-gray-50 shadow-sm">
+                            <div class="flex justify-between items-center mb-10">
+                                <div class="flex gap-4">
+                                    ${['All', 'Swap', 'Received', 'Sent'].map(type => `
+                                        <button onclick="filterTransactions('${type}')" class="${state.transactionFilter === type ? 'bg-primary text-white' : 'bg-gray-50 text-gray-500'} px-8 py-3 rounded-2xl font-bold border border-gray-100 transition-all">${type}</button>
+                                    `).join('')}
+                                </div>
+                                <div class="flex gap-4">
+                                    <div class="relative">
+                                        <i class="ph-bold ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                        <input type="text" placeholder="Search asset..." 
+                                            value="${state.transactionSearch}"
+                                            oninput="searchTransactions(this.value)"
+                                            class="pl-12 pr-6 py-3 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:border-primary transition-all w-64 font-medium">
+                                    </div>
+                                    <button class="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-400 border border-gray-100"><i class="ph-bold ph-sliders"></i></button>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4">
+                                ${state.transactions
+                        .filter(t => state.transactionFilter === 'All' || t.type === state.transactionFilter)
+                        .filter(t => t.asset.toLowerCase().includes(state.transactionSearch.toLowerCase()))
+                        .map((txn, i) => `
+                                     <div class="flex items-center justify-between p-6 bg-gray-50/50 rounded-3xl border border-gray-100/50 hover:border-primary/20 transition-all group">
+                                         <div class="flex items-center gap-6">
+                                             <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-sm group-hover:bg-primary group-hover:text-white transition-all">
+                                                 <i class="ph-bold ph-arrow-${txn.type === 'Received' || (txn.type === 'Swap' && txn.amount.startsWith('+')) ? 'down-left' : 'up-right'} text-xl"></i>
+                                             </div>
+                                             <div>
+                                                 <h4 class="font-bold text-lg text-dark">${txn.type} ${txn.asset}</h4>
+                                                 <p class="text-xs text-gray-400 font-bold">${txn.date} • ID: #TXN-9023${i}</p>
+                                             </div>
+                                         </div>
+                                         <div class="flex gap-12 items-center">
+                                             <div class="text-right">
+                                                 <span class="block font-extrabold ${txn.amount.startsWith('+') ? 'text-emerald-500' : 'text-dark'}">${txn.amount} ${txn.asset}</span>
+                                                 <span class="text-xs text-gray-400 font-bold">${txn.fiat}</span>
+                                             </div>
+                                             <span class="px-4 py-1.5 rounded-full text-xs font-bold ${txn.status === 'Pending' ? 'bg-orange-100 text-orange-600' : 'bg-emerald-100 text-emerald-600'}">${txn.status}</span>
+                                         </div>
+                                     </div>
+                                 `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            settings: {
+                title: 'Settings',
+                subtitle: 'Customize your dashboard experience',
+                render: () => `
+                    <div class="page-content">
+                        <div class="grid grid-cols-12 gap-10">
+                            <!-- Menu -->
+                            <div class="col-span-4 space-y-2">
+                                ${['Profile', 'Security', 'Preferences', 'Notifications', 'Linked Accounts'].map((item) => `
+                                    <button onclick="navigateSettings('${item}')" class="w-full text-left px-8 py-4 rounded-2xl font-bold flex items-center justify-between group transition-all ${state.currentSettingsTab === item ? 'bg-white shadow-sm text-primary' : 'text-gray-400 hover:bg-white hover:shadow-sm hover:text-dark'}">
+                                        <span>${item}</span>
+                                        <i class="ph-bold ph-caret-right text-xs ${state.currentSettingsTab === item ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity"></i>
+                                    </button>
+                                `).join('')}
+                            </div>
+                            
+                            <!-- Content -->
+                            <div class="col-span-8 bg-white rounded-[2.5rem] p-10 border border-gray-50 shadow-sm min-h-[500px]">
+                                ${renderSettingsContent()}
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        // --- Settings Logic ---
+        function navigateSettings(tab) {
+            state.currentSettingsTab = tab;
+            const view = views['settings'];
+            $('#view-container').innerHTML = view.render();
+            showToast(`Switched to ${tab} settings`, 'info');
+        }
+
+        function renderSettingsContent() {
+            const tab = state.currentSettingsTab;
+            if (tab === 'Profile') {
+                return `
+                    <h3 class="text-xl font-bold mb-8">Profile Information</h3>
+                    <div class="space-y-8">
+                        <div class="flex items-center gap-6 mb-10">
+                            <div class="relative group">
+                                <img src="https://ui-avatars.com/api/?name=John+Doe&background=6C5DD3&color=fff" class="w-24 h-24 rounded-3xl border-4 border-gray-50 shadow-md">
+                                <div class="absolute inset-0 bg-black/40 rounded-3xl opacity-0 group-hover:opacity-100 flex items-center justify-center cursor-pointer transition-opacity"><i class="ph-bold ph-camera text-white text-xl"></i></div>
+                            </div>
+                            <div><p class="font-extrabold text-xl">John Doe</p><p class="text-gray-400 font-medium">Verified Account</p></div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="space-y-2"><label class="text-xs text-gray-400 font-bold uppercase pl-1">Full Name</label><input type="text" id="prof-name" value="John Doe" class="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:border-primary font-bold"></div>
+                            <div class="space-y-2"><label class="text-xs text-gray-400 font-bold uppercase pl-1">Email</label><input type="email" id="prof-email" value="john@example.com" class="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:border-primary font-bold"></div>
+                            <div class="space-y-2"><label class="text-xs text-gray-400 font-bold uppercase pl-1">Currency</label><select class="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:border-primary font-bold"><option>USD ($)</option><option>EUR (€)</option><option>GBP (£)</option></select></div>
+                            <div class="space-y-2"><label class="text-xs text-gray-400 font-bold uppercase pl-1">Language</label><select class="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl outline-none focus:border-primary font-bold"><option>English</option><option>Spanish</option><option>French</option></select></div>
+                        </div>
+                        <div class="pt-6 border-t border-gray-50 flex justify-end gap-4">
+                            <button onclick="resetProfile()" class="px-8 py-3 rounded-2xl font-bold text-gray-400 hover:bg-gray-50">Reset</button>
+                            <button onclick="showToast('Your changes have been saved!', 'success')" class="primary-purple text-white px-10 py-3 rounded-2xl font-bold shadow-lg hover:opacity-90">Save Changes</button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="flex flex-col items-center justify-center h-full text-center py-20">
+                        <div class="w-20 h-20 bg-gray-50 rounded-3xl flex items-center justify-center mb-6">
+                            <i class="ph-bold ph-lock-key text-gray-300 text-4xl"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">${tab} Settings</h3>
+                        <p class="text-gray-400 max-w-xs">This section is currently being updated for the next version of Finvest.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function resetProfile() {
+            $('#prof-name').value = 'John Doe';
+            $('#prof-email').value = 'john@example.com';
+            showToast('Profile fields reset', 'warning');
+        }
+
+        // --- Market Logic ---
+        function filterMarket(cat) {
+            state.marketFilter = cat;
+            navigateTo('market');
+            showToast(`Market filtered to ${cat}`, 'info');
+        }
+
+        function buyCrypto(symbol) {
+            showToast(`Preparing to buy ${symbol}...`, 'info');
+
+            // Set global swap state
+            const asset = state.assets.find(a => a.symbol === symbol);
+            state.swapState.from = 'USDT';
+            state.swapState.to = symbol;
+            state.swapState.isUsdtToEth = true;
+            state.swapState.rate = asset ? (1 / asset.price) : 0.01;
+
+            navigateTo('home');
+            setTimeout(updateConverterUI, 500);
+        }
+
+        function focusSwap() {
+            navigateTo('home');
+            setTimeout(() => {
+                $('#sell-input').focus();
+                $('#sell-input').select();
+            }, 500);
+        }
+
+        // --- Transaction Logic ---
+        function filterTransactions(type) {
+            state.transactionFilter = type;
+            navigateTo('transactions');
+        }
+
+        function searchTransactions(query) {
+            state.transactionSearch = query;
+            const container = $('#view-container');
+            if (container) container.innerHTML = views['transactions'].render();
+        }
+
+        function signOut() {
+            showToast('Signing out...', 'warning');
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+
+        function simulateDeposit() {
+            const amount = 5000;
+            state.balance += amount;
+            showToast(`$${amount} successfully deposited!`, 'success');
+            navigateTo('home');
+        }
+
+        // --- SPA Routing ---
+        function navigateTo(viewId) {
+            const view = views[viewId];
+            if (!view) return;
+
+            state.currentView = viewId;
+            const container = $('#view-container');
+            const rightColumn = $('#right-widget-column');
+
+            // Update UI
+            $('#page-title').innerText = view.title;
+            $('#page-subtitle').innerText = view.subtitle;
+
+            // Toggle Right Column Visibility (Show only on Home & Assets)
+            const wrapper = $('#main-content-wrapper');
+            if (['home', 'assets'].includes(viewId)) {
+                rightColumn.style.transform = 'translateX(0)';
+                rightColumn.style.opacity = '1';
+                rightColumn.style.pointerEvents = 'auto';
+                if (wrapper) wrapper.classList.add('mr-96');
+            } else {
+                rightColumn.style.transform = 'translateX(100%)';
+                rightColumn.style.opacity = '0';
+                rightColumn.style.pointerEvents = 'none';
+                if (wrapper) wrapper.classList.remove('mr-96');
+            }
+            rightColumn.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+
+            // Render Content
+            container.innerHTML = view.render();
+
+            // Update Nav State
+            $$('.sidebar-nav-item').forEach(item => {
+                item.classList.remove('sidebar-item-active');
+                item.classList.add('text-gray-400');
+            });
+            const activeNav = $(`#nav-${viewId}`);
+            if (activeNav) {
+                activeNav.classList.add('sidebar-item-active');
+                activeNav.classList.remove('text-gray-400');
+            }
+
+            // Scroll to top
+            $('#main-scroll-area').scrollTop = 0;
+
+            // Trigger specific page animations
+            if (viewId === 'home') animateHeroChart();
+
+            showToast(`Navigated to ${viewId}`, 'info');
+        }
+
+        function animateHeroChart() {
+            const chartPath = $('#home-chart-path');
+            if (!chartPath) return;
+            chartPath.style.strokeDasharray = '1000';
+            chartPath.style.strokeDashoffset = '1000';
+            chartPath.style.transition = 'stroke-dashoffset 2s ease-in-out';
+            setTimeout(() => chartPath.style.strokeDashoffset = '0', 100);
+        }
+
+        // --- Utilities ---
+        const $ = (selector) => document.querySelector(selector);
+        const $$ = (selector) => document.querySelectorAll(selector);
+
+        // --- Toast System ---
+        function showToast(message, type = 'info') {
+            const container = $('#toast-container');
+            const toast = document.createElement('div');
+
+            const colors = {
+                success: 'bg-emerald-500',
+                info: 'bg-primary',
+                warning: 'bg-orange-500',
+                error: 'bg-rose-500'
+            };
+
+            const icons = {
+                success: 'ph-check-circle',
+                info: 'ph-info',
+                warning: 'ph-warning-circle',
+                error: 'ph-x-circle'
+            };
+
+            toast.className = `toast ${colors[type]} text-white px-6 py-4 rounded-2xl shadow-xl flex items-center gap-3 min-w-[280px]`;
+            toast.innerHTML = `
+                <i class="ph-fill ${icons[type]} text-xl"></i>
+                <span class="font-bold text-sm">${message}</span>
+            `;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(20px)';
+                toast.style.transition = 'all 0.3s ease-out';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // --- Dropdowns ---
+        function setupDropdowns() {
+            const dropdowns = [
+                { btn: '#notif-btn', menu: '#notif-dropdown' },
+                { btn: '#profile-btn', menu: '#profile-dropdown' }
+            ];
+
+            dropdowns.forEach(({ btn, menu }) => {
+                const b = $(btn);
+                const m = $(menu);
+                if (!b || !m) return;
+
+                b.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    $$('.dropdown-menu').forEach(dm => {
+                        if (dm !== m) dm.classList.remove('active');
+                    });
+                    m.classList.toggle('active');
+                });
+            });
+
+            document.addEventListener('click', () => {
+                $$('.dropdown-menu').forEach(m => m.classList.remove('active'));
+            });
+        }
+
+        // --- Currency Converter ---
+        function updateConverterUI() {
+            const sellCurr = $('#sell-currency');
+            const receiveCurr = $('#receive-currency');
+            const sellIcon = $('#sell-icon');
+            const receiveIcon = $('#receive-icon');
+            const sellInput = $('#sell-input');
+            const receiveInput = $('#receive-input');
+
+            if (!sellCurr || !receiveInput) return;
+
+            sellCurr.innerText = state.swapState.from;
+            receiveCurr.innerText = state.swapState.to;
+
+            const fromAsset = state.assets.find(a => a.symbol === state.swapState.from) || { icon: 'ph-lightning', color: 'primary', bg: 'emerald-50' };
+            const toAsset = state.assets.find(a => a.symbol === state.swapState.to) || { icon: 'ph-lightning', color: 'primary', bg: 'purple-50' };
+
+            sellIcon.className = `w-10 h-10 bg-${fromAsset.bg} flex items-center justify-center rounded-2xl`;
+            sellIcon.innerHTML = `<i class="ph-fill ${fromAsset.icon} text-${fromAsset.color} text-xl"></i>`;
+
+            receiveIcon.className = `w-10 h-10 bg-${toAsset.bg} flex items-center justify-center rounded-2xl`;
+            receiveIcon.innerHTML = `<i class="ph-fill ${toAsset.icon} text-${toAsset.color} text-xl"></i>`;
+
+            const val = parseFloat(sellInput.value) || 0;
+            receiveInput.value = (val * state.swapState.rate).toFixed(5);
+        }
+
+        function setupConverter() {
+            const sellInput = $('#sell-input');
+            const swapBtn = $('#swap-btn');
+            const mainAction = $('#main-swap-action');
+
+            if (!sellInput) return;
+
+            sellInput.addEventListener('input', updateConverterUI);
+
+            swapBtn.addEventListener('click', () => {
+                const oldFrom = state.swapState.from;
+                state.swapState.from = state.swapState.to;
+                state.swapState.to = oldFrom;
+                state.swapState.isUsdtToEth = !state.swapState.isUsdtToEth;
+                state.swapState.rate = 1 / state.swapState.rate;
+
+                updateConverterUI();
+                showToast('Currencies swapped', 'info');
+            });
+
+            mainAction.addEventListener('click', () => {
+                const val = parseFloat(sellInput.value);
+                if (val < 1) {
+                    showToast('Minimum amount is 1', 'error');
+                    return;
+                }
+
+                mainAction.disabled = true;
+                mainAction.innerText = 'Processing...';
+
+                setTimeout(() => {
+                    const received = $('#receive-input').value;
+                    showToast(`Successfully swapped ${val} ${state.swapState.from}!`, 'success');
+                    mainAction.disabled = false;
+                    mainAction.innerText = 'Swap Now';
+
+                    // Update balance (mock)
+                    if (state.swapState.from === 'USDT') state.balance -= val;
+                    else if (state.swapState.to === 'USDT') state.balance += parseFloat((val * state.swapState.rate).toFixed(2));
+
+                    // Add real transaction to state
+                    state.transactions.unshift({
+                        type: 'Swap',
+                        asset: state.swapState.to,
+                        date: 'Just now',
+                        amount: `+${received}`,
+                        fiat: `$${(val * (state.swapState.from === 'USDT' ? 1 : (1 / state.swapState.rate))).toFixed(2)}`,
+                        status: 'Completed'
+                    });
+
+                    // Refresh view if needed
+                    navigateTo(state.currentView);
+                }, 1500);
+            });
+
+            // Initial UI sync
+            updateConverterUI();
+        }
+
+        function copyInviteLink() {
+            navigator.clipboard.writeText('https://finvest.io/ref/johndoe');
+            showToast('Invite link copied to clipboard!', 'success');
+        }
+
+        // --- Init ---
+        window.addEventListener('load', () => {
+            setupDropdowns();
+            setupConverter();
+            navigateTo('home'); // Entry Point
+        });
+    </script>
+</body>
+
+</html>
