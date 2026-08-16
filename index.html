@@ -413,7 +413,7 @@
             <div class="mobile-header-spacer"></div>
             <div>
                 <h1 id="page-title" class="text-3xl font-bold mb-1">Dashboard</h1>
-                <p id="page-subtitle" class="text-gray-400 font-medium">Welcome back, John Doe</p>
+                <p id="page-subtitle" class="text-gray-400 font-medium">Welcome back, Ahmed</p>
             </div>
             <div class="flex items-center gap-4">
                 <!-- Notifications -->
@@ -552,20 +552,6 @@
             </div>
         </div>
 
-        <!-- Rewards Card -->
-        <div
-            class="primary-purple rounded-[2.5rem] p-8 text-white relative overflow-hidden group cursor-pointer shadow-lg hover:shadow-purple-200 transition-all">
-            <i
-                class="ph-fill ph-gift absolute -right-4 -bottom-4 text-9xl opacity-10 group-hover:scale-110 transition-transform duration-500"></i>
-            <h3 class="text-xl font-bold mb-2">Refer & Earn</h3>
-            <p class="text-purple-100 text-sm mb-6 leading-relaxed">Invite your friends and get 15% of their trading
-                fees.</p>
-            <button onclick="copyInviteLink()"
-                class="bg-white text-primary w-full py-4 rounded-2xl font-bold hover:bg-opacity-90 transition-colors">
-                Get Invite Link
-            </button>
-        </div>
-
         <!-- Market Stats Widget -->
         <div class="mt-10 bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm">
             <div class="flex items-center justify-between mb-6">
@@ -691,25 +677,15 @@
                     state.charts.portfolio = new Chart(portfolioCtx, {
                         type: 'line',
                         data: {
-                            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                            labels: ['1W', '2W', '3W', '4W'],
                             datasets: [
                                 {
                                     label: 'Portfolio',
-                                    data: [45000, 48000, 46500, 52000, 58000, 62000, 59000, 65000, 68000, 71000, 69000, 69880],
+                                    data: [65000, 67000, 68500, 69880],
                                     borderColor: '#6C5DD3',
                                     backgroundColor: 'rgba(108, 93, 211, 0.1)',
                                     borderWidth: 2,
                                     fill: true,
-                                    tension: 0.4
-                                },
-                                {
-                                    label: 'Benchmark',
-                                    data: [42000, 44000, 43000, 47000, 51000, 54000, 52000, 56000, 59000, 62000, 60000, 62000],
-                                    borderColor: '#10b981',
-                                    backgroundColor: 'rgba(16, 185, 129, 0.05)',
-                                    borderWidth: 2,
-                                    borderDash: [5, 5],
-                                    fill: false,
                                     tension: 0.4
                                 }
                             ]
@@ -718,34 +694,30 @@
                             responsive: true,
                             maintainAspectRatio: false,
                             plugins: {
-                                legend: {
-                                    display: true,
-                                    position: 'top',
-                                    align: 'end',
-                                    labels: {
-                                        usePointStyle: true,
-                                        pointStyle: 'circle',
-                                        padding: 20,
-                                        font: { size: 12, weight: 'bold' }
-                                    }
-                                },
+                                legend: { display: false },
                                 tooltip: {
                                     backgroundColor: '#1A1D1F',
                                     titleColor: '#fff',
                                     bodyColor: '#fff',
-                                    padding: 12,
-                                    cornerRadius: 8
+                                    padding: 8,
+                                    cornerRadius: 6,
+                                    displayColors: false,
+                                    callbacks: {
+                                        label: function(context) {
+                                            return '$' + context.parsed.y.toLocaleString();
+                                        }
+                                    }
                                 }
                             },
                             scales: {
                                 x: {
                                     grid: { display: false },
-                                    ticks: { font: { size: 11, weight: 'bold' }, color: '#9CA3AF' }
+                                    ticks: { font: { size: 10, weight: 'bold' }, color: '#9CA3AF' }
                                 },
                                 y: {
                                     grid: { color: 'rgba(0,0,0,0.05)' },
                                     ticks: {
-                                        font: { size: 11, weight: 'bold' },
+                                        font: { size: 10, weight: 'bold' },
                                         color: '#9CA3AF',
                                         callback: function(value) {
                                             return '$' + (value/1000) + 'k';
@@ -951,23 +923,7 @@
             return { labels, price, ma20, ma50 };
         }
 
-        function updateChartPeriod(period) {
-            if (!state.charts.portfolio) return;
-            
-            const periodData = {
-                '1D': { labels: ['9am', '10am', '11am', '12pm', '1pm', '2pm', '3pm'], data: [69500, 69600, 69400, 69800, 69700, 69800, 69880] },
-                '1W': { labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], data: [68000, 68500, 68200, 69000, 69500, 69700, 69880] },
-                '1M': { labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'], data: [65000, 67000, 68500, 69880] },
-                '1Y': { labels: ['Q1', 'Q2', 'Q3', 'Q4'], data: [45000, 58000, 62000, 69880] }
-            };
-            
-            const selected = periodData[period];
-            state.charts.portfolio.data.labels = selected.labels;
-            state.charts.portfolio.data.datasets[0].data = selected.data;
-            state.charts.portfolio.update();
-            
-            showToast(`Chart period updated to ${period}`, 'info');
-        }
+
 
         function updateTechnicalChart(symbol) {
             if (!state.charts.technical) return;
@@ -1058,11 +1014,11 @@
             currentSettingsTab: 'Profile',
             balance: 69880,
             userProfile: {
-                name: 'John Doe',
-                email: 'john@example.com',
+                name: 'Ahmed',
+                email: 'ahmed@example.com',
                 currency: 'USD',
                 language: 'English',
-                avatar: 'https://ui-avatars.com/api/?name=John+Doe&background=6C5DD3&color=fff',
+                avatar: 'https://ui-avatars.com/api/?name=Ahmed&background=6C5DD3&color=fff',
                 notifications: true,
                 twoFactor: false,
                 bio: 'Crypto enthusiast and day trader'
@@ -1100,7 +1056,7 @@
         const views = {
             home: {
                 title: 'Dashboard',
-                subtitle: `Welcome back, ${state.userProfile.name}`,
+                subtitle: `Welcome back, Ahmed`,
                 render: () => `
                     <div class="page-content">
                         <!-- Balance Card -->
@@ -1123,18 +1079,13 @@
                         
                         <!-- Advanced Charts Section -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
-                            <!-- Portfolio Performance Chart -->
+                            <!-- Quick Performance Summary -->
                             <div class="bg-white rounded-[2.5rem] p-8 border border-gray-50 shadow-sm">
                                 <div class="flex justify-between items-center mb-6">
-                                    <h3 class="text-xl font-bold">Portfolio Performance</h3>
-                                    <div class="flex gap-2">
-                                        <button onclick="updateChartPeriod('1D')" class="px-3 py-1 rounded-lg text-xs font-bold bg-primary text-white">1D</button>
-                                        <button onclick="updateChartPeriod('1W')" class="px-3 py-1 rounded-lg text-xs font-bold bg-gray-100 text-gray-500">1W</button>
-                                        <button onclick="updateChartPeriod('1M')" class="px-3 py-1 rounded-lg text-xs font-bold bg-gray-100 text-gray-500">1M</button>
-                                        <button onclick="updateChartPeriod('1Y')" class="px-3 py-1 rounded-lg text-xs font-bold bg-gray-100 text-gray-500">1Y</button>
-                                    </div>
+                                    <h3 class="text-xl font-bold">Quick Performance</h3>
+                                    <span class="text-emerald-500 font-bold text-sm">+18.2% all time</span>
                                 </div>
-                                <canvas id="portfolioChart" height="200"></canvas>
+                                <canvas id="portfolioChart" height="120"></canvas>
                             </div>
 
                             <!-- Asset Allocation Chart -->
@@ -1144,7 +1095,7 @@
                                     <span class="text-xs text-gray-400 font-bold">Total: $${state.assets.reduce((acc, curr) => acc + (parseFloat(curr.amount) * curr.price), 0).toLocaleString()}</span>
                                 </div>
                                 <div class="flex items-center justify-center">
-                                    <canvas id="allocationChart" height="200"></canvas>
+                                    <canvas id="allocationChart" height="120"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -1683,8 +1634,8 @@
 
         function resetProfile() {
             const defaultProfile = {
-                name: 'John Doe',
-                email: 'john@example.com',
+                name: 'Ahmed',
+                email: 'ahmed@example.com',
                 currency: 'USD',
                 language: 'English',
                 bio: 'Crypto enthusiast and day trader'
@@ -1700,7 +1651,7 @@
         }
 
         function updateProfileUI() {
-            // Update page subtitle
+            // Update page subtitle (both in HTML and rendered views)
             const pageSubtitle = $('#page-subtitle');
             if (pageSubtitle) {
                 pageSubtitle.innerText = `Welcome back, ${state.userProfile.name}`;
@@ -1728,6 +1679,14 @@
             const profileImg = $('#header-profile-img');
             if (profileImg) {
                 profileImg.src = state.userProfile.avatar;
+            }
+
+            // Update views that reference userProfile
+            if (state.currentView === 'home') {
+                const homeView = views.home;
+                if (homeView && typeof homeView.render === 'function') {
+                    // Force re-render of home view if needed
+                }
             }
         }
 
@@ -1769,6 +1728,9 @@
                 const savedProfile = localStorage.getItem('finvest_userProfile');
                 if (savedProfile) {
                     state.userProfile = JSON.parse(savedProfile);
+                    updateProfileUI();
+                } else {
+                    // Initialize with default profile
                     updateProfileUI();
                 }
             } catch (e) {
