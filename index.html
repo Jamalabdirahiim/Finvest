@@ -874,31 +874,6 @@
                     });
                 }
 
-                // Volume Chart
-                const volumeCtx = $('#volumeChart');
-                if (volumeCtx) {
-                    state.charts.volume = new Chart(volumeCtx, {
-                        type: 'bar',
-                        data: {
-                            labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
-                            datasets: [{
-                                data: [65, 59, 80, 81, 56, 55, 40],
-                                backgroundColor: ['#6C5DD3', '#6C5DD3', '#10b981', '#10b981', '#f43f5e', '#6C5DD3', '#6C5DD3'],
-                                borderRadius: 4
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { display: false } },
-                            scales: {
-                                x: { display: false },
-                                y: { display: false }
-                            }
-                        }
-                    });
-                }
-
                 console.log('Charts initialized successfully');
             } catch (e) {
                 console.error('Error initializing charts:', e);
@@ -1101,47 +1076,40 @@
                         </div>
 
                         <!-- Technical Analysis Section -->
-                        <div class="bg-white rounded-[2.5rem] p-8 mb-10 border border-gray-50 shadow-sm">
-                            <div class="flex justify-between items-center mb-6">
-                                <h3 class="text-xl font-bold">Technical Analysis</h3>
-                                <select class="px-4 py-2 rounded-xl border border-gray-200 text-sm font-bold" onchange="updateTechnicalChart(this.value)">
+                        <div class="bg-white rounded-[2.5rem] p-6 mb-10 border border-gray-50 shadow-sm">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold">Technical Analysis</h3>
+                                <select class="px-3 py-1 rounded-lg border border-gray-200 text-xs font-bold" onchange="updateTechnicalChart(this.value)">
                                     <option value="BTC">BTC/USDT</option>
                                     <option value="ETH">ETH/USDT</option>
                                     <option value="SOL">SOL/USDT</option>
                                 </select>
                             </div>
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                                 <div class="lg:col-span-2">
-                                    <canvas id="technicalChart" height="150"></canvas>
+                                    <canvas id="technicalChart" height="100"></canvas>
                                 </div>
-                                <div class="space-y-4">
-                                    <div class="bg-gray-50 rounded-2xl p-4">
-                                        <div class="flex justify-between items-center mb-2">
+                                <div class="space-y-3">
+                                    <div class="bg-gray-50 rounded-xl p-3">
+                                        <div class="flex justify-between items-center mb-1">
                                             <span class="text-xs text-gray-400 font-bold">RSI (14)</span>
-                                            <span class="text-sm font-bold text-emerald-500">58.3</span>
+                                            <span class="text-xs font-bold text-emerald-500">58.3</span>
                                         </div>
-                                        <div class="w-full bg-gray-200 rounded-full h-2">
-                                            <div class="bg-emerald-500 h-2 rounded-full" style="width: 58.3%"></div>
+                                        <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                            <div class="bg-emerald-500 h-1.5 rounded-full" style="width: 58.3%"></div>
                                         </div>
                                     </div>
-                                    <div class="bg-gray-50 rounded-2xl p-4">
-                                        <div class="flex justify-between items-center mb-2">
+                                    <div class="bg-gray-50 rounded-xl p-3">
+                                        <div class="flex justify-between items-center mb-1">
                                             <span class="text-xs text-gray-400 font-bold">MACD</span>
-                                            <span class="text-sm font-bold text-emerald-500">+124.5</span>
+                                            <span class="text-xs font-bold text-emerald-500">+124.5</span>
                                         </div>
-                                        <div class="flex gap-1">
-                                            <div class="flex-1 bg-emerald-200 h-2 rounded-l"></div>
-                                            <div class="flex-1 bg-emerald-400 h-2"></div>
-                                            <div class="flex-1 bg-emerald-500 h-2"></div>
-                                            <div class="flex-1 bg-emerald-600 h-2 rounded-r"></div>
+                                        <div class="flex gap-0.5">
+                                            <div class="flex-1 bg-emerald-200 h-1.5 rounded-l"></div>
+                                            <div class="flex-1 bg-emerald-400 h-1.5"></div>
+                                            <div class="flex-1 bg-emerald-500 h-1.5"></div>
+                                            <div class="flex-1 bg-emerald-600 h-1.5 rounded-r"></div>
                                         </div>
-                                    </div>
-                                    <div class="bg-gray-50 rounded-2xl p-4">
-                                        <div class="flex justify-between items-center mb-2">
-                                            <span class="text-xs text-gray-400 font-bold">Volume (24h)</span>
-                                            <span class="text-sm font-bold">$28.5B</span>
-                                        </div>
-                                        <canvas id="volumeChart" height="60"></canvas>
                                     </div>
                                 </div>
                             </div>
