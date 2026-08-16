@@ -413,7 +413,7 @@
             <div class="mobile-header-spacer"></div>
             <div>
                 <h1 id="page-title" class="text-3xl font-bold mb-1">Dashboard</h1>
-                <p id="page-subtitle" class="text-gray-400 font-medium">Welcome back, Ahmed</p>
+                <p id="page-subtitle" class="text-gray-400 font-medium">Welcome back, <span id="header-welcome-name">Loading...</span></p>
             </div>
             <div class="flex items-center gap-4">
                 <!-- Notifications -->
@@ -1031,7 +1031,7 @@
         const views = {
             home: {
                 title: 'Dashboard',
-                subtitle: `Welcome back, Ahmed`,
+                subtitle: `Welcome back, ${state.userProfile.name}`,
                 render: () => `
                     <div class="page-content">
                         <!-- Balance Card -->
@@ -1622,7 +1622,13 @@
             // Update page subtitle (both in HTML and rendered views)
             const pageSubtitle = $('#page-subtitle');
             if (pageSubtitle) {
-                pageSubtitle.innerText = `Welcome back, ${state.userProfile.name}`;
+                pageSubtitle.innerHTML = `Welcome back, <span id="header-welcome-name">${state.userProfile.name}</span>`;
+            }
+
+            // Update header welcome name specifically
+            const headerWelcomeName = $('#header-welcome-name');
+            if (headerWelcomeName) {
+                headerWelcomeName.innerText = state.userProfile.name;
             }
 
             // Update profile display in settings
@@ -2040,45 +2046,6 @@
             } catch (e) {
                 console.error('Error setting up converter:', e);
             }
-        }
-
-        function copyInviteLink() {
-            const inviteLink = 'https://finvest.io/ref/johndoe';
-            
-            // Try modern clipboard API first
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(inviteLink)
-                    .then(() => {
-                        showToast('Invite link copied to clipboard!', 'success');
-                    })
-                    .catch((err) => {
-                        console.error('Clipboard API failed:', err);
-                        // Fallback to older method
-                        fallbackCopyText(inviteLink);
-                    });
-            } else {
-                // Fallback for older browsers
-                fallbackCopyText(inviteLink);
-            }
-        }
-
-        function fallbackCopyText(text) {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            textArea.style.position = 'fixed';
-            textArea.style.left = '-9999px';
-            document.body.appendChild(textArea);
-            textArea.select();
-            
-            try {
-                document.execCommand('copy');
-                showToast('Invite link copied to clipboard!', 'success');
-            } catch (err) {
-                console.error('Fallback copy failed:', err);
-                showToast('Failed to copy link', 'error');
-            }
-            
-            document.body.removeChild(textArea);
         }
 
         // --- Init ---
