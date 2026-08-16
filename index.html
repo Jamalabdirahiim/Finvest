@@ -42,6 +42,22 @@
             }
         }
 
+        @media (max-width: 1280px) {
+            aside#right-widget-column {
+                width: 18rem !important;
+            }
+            
+            #main-content-wrapper {
+                margin-right: 18rem !important;
+            }
+        }
+
+        @media (min-width: 1281px) {
+            #main-content-wrapper {
+                margin-right: 20rem !important;
+            }
+        }
+
         @media (max-width: 768px) {
             aside.sidebar {
                 transform: translateX(-100%) !important;
@@ -55,6 +71,11 @@
             
             #main-content-wrapper {
                 margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+            
+            aside#right-widget-column {
+                display: none !important;
             }
             
             header {
@@ -83,6 +104,10 @@
             
             .grid-cols-12 {
                 grid-template-columns: 1fr !important;
+            }
+            
+            .lg\:col-span-2 {
+                grid-column: span 1 !important;
             }
             
             /* Mobile hamburger menu */
@@ -124,6 +149,10 @@
                 padding: 1rem !important;
             }
             
+            .p-6 {
+                padding: 0.75rem !important;
+            }
+            
             .text-3xl {
                 font-size: 1.5rem !important;
             }
@@ -132,8 +161,20 @@
                 font-size: 2rem !important;
             }
             
+            .text-xl {
+                font-size: 1.125rem !important;
+            }
+            
+            .text-lg {
+                font-size: 1rem !important;
+            }
+            
             .gap-8 {
                 gap: 1rem !important;
+            }
+            
+            .gap-6 {
+                gap: 0.75rem !important;
             }
             
             .gap-20 {
@@ -142,6 +183,10 @@
             
             .gap-12 {
                 gap: 0.75rem !important;
+            }
+            
+            .gap-4 {
+                gap: 0.5rem !important;
             }
             
             .w-32 {
@@ -155,6 +200,11 @@
             /* Hide less important elements on mobile */
             .hide-mobile {
                 display: none !important;
+            }
+            
+            /* Compact charts on mobile */
+            canvas {
+                max-height: 120px !important;
             }
         }
 
@@ -407,7 +457,7 @@
 
     <!-- Main Content Area -->
     <!-- Main Content Area -->
-    <div id="main-content-wrapper" class="ml-64 mr-96 flex-1 flex flex-col h-full bg-[#F8F9FD]">
+    <div id="main-content-wrapper" class="ml-64 mr-80 flex-1 flex flex-col h-full bg-[#F8F9FD]">
         <!-- Header (Fixed at top) -->
         <header class="p-10 pb-0 flex justify-between items-center z-20">
             <div class="mobile-header-spacer"></div>
@@ -441,9 +491,9 @@
                 <div class="relative">
                     <div id="profile-btn"
                         class="profile-btn flex items-center gap-3 bg-white pl-2 pr-4 py-2 rounded-2xl border border-gray-100 cursor-pointer hover:shadow-md transition-shadow">
-                        <img id="header-profile-img" src="https://ui-avatars.com/api/?name=John+Doe&background=6C5DD3&color=fff" alt="User"
+                        <img id="header-profile-img" src="https://ui-avatars.com/api/?name=Ahmed&background=6C5DD3&color=fff" alt="User"
                             class="w-10 h-10 rounded-xl">
-                        <span id="header-profile-name" class="font-bold text-sm">John D.</span>
+                        <span id="header-profile-name" class="font-bold text-sm">Ahmed</span>
                         <i class="ph-bold ph-caret-down text-xs text-gray-400"></i>
                     </div>
                     <div id="profile-dropdown" class="dropdown-menu">
@@ -494,82 +544,81 @@
 
     <!-- Right Column (Widgets) - Always Visible for Home, hidden contextually if needed -->
     <aside id="right-widget-column"
-        class="w-96 bg-white border-l border-gray-100 fixed right-0 h-full p-10 overflow-y-auto">
+        class="w-80 bg-white border-l border-gray-100 fixed right-0 h-full p-6 overflow-y-auto">
         <!-- Sell Crypto Widget -->
-        <div class="bg-gray-50 rounded-[2.5rem] p-8 mb-8 border border-gray-100 shadow-sm">
-            <h3 class="text-xl font-bold mb-8">Sell Crypto</h3>
+        <div class="bg-gray-50 rounded-[2rem] p-6 mb-6 border border-gray-100 shadow-sm">
+            <h3 class="text-lg font-bold mb-6">Sell Crypto</h3>
 
-            <div class="space-y-6">
+            <div class="space-y-4">
                 <!-- From -->
                 <div>
-                    <label class="text-xs text-gray-400 font-bold uppercase block mb-3 pl-1">You Sell</label>
+                    <label class="text-xs text-gray-400 font-bold uppercase block mb-2 pl-1">You Sell</label>
                     <div
-                        class="bg-white p-4 rounded-3xl border border-gray-200 flex items-center justify-between focus-within:border-primary transition-colors">
-                        <div class="flex items-center gap-3">
+                        class="bg-white p-3 rounded-2xl border border-gray-200 flex items-center justify-between focus-within:border-primary transition-colors">
+                        <div class="flex items-center gap-2">
                             <div id="sell-icon"
-                                class="w-10 h-10 bg-emerald-50 flex items-center justify-center rounded-2xl">
-                                <i class="ph-fill ph-currency-dollar text-emerald-500 text-xl"></i>
+                                class="w-8 h-8 bg-emerald-50 flex items-center justify-center rounded-xl">
+                                <i class="ph-fill ph-currency-dollar text-emerald-500 text-lg"></i>
                             </div>
-                            <span id="sell-currency" class="font-bold">USDT</span>
+                            <span id="sell-currency" class="font-bold text-sm">USDT</span>
                         </div>
                         <input id="sell-input" type="number" value="1000"
-                            class="w-24 text-right font-extrabold outline-none bg-transparent">
+                            class="w-20 text-right font-extrabold outline-none bg-transparent text-sm">
                     </div>
                 </div>
 
                 <!-- Swap Icon -->
-                <div class="flex justify-center -my-3 relative z-10">
+                <div class="flex justify-center -my-2 relative z-10">
                     <button id="swap-btn"
-                        class="w-10 h-10 bg-white border border-gray-100 rounded-xl flex items-center justify-center shadow-lg cursor-pointer hover:rotate-180 transition-transform duration-500">
-                        <i class="ph-bold ph-arrows-down-up text-primary"></i>
+                        class="w-8 h-8 bg-white border border-gray-100 rounded-lg flex items-center justify-center shadow-md cursor-pointer hover:rotate-180 transition-transform duration-500">
+                        <i class="ph-bold ph-arrows-down-up text-primary text-sm"></i>
                     </button>
                 </div>
 
                 <!-- To -->
                 <div class="mt-0">
-                    <label class="text-xs text-gray-400 font-bold uppercase block mb-3 pl-1">You Receive</label>
-                    <div class="bg-white p-4 rounded-3xl border border-gray-200 flex items-center justify-between">
-                        <div class="flex items-center gap-3">
+                    <label class="text-xs text-gray-400 font-bold uppercase block mb-2 pl-1">You Receive</label>
+                    <div class="bg-white p-3 rounded-2xl border border-gray-200 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
                             <div id="receive-icon"
-                                class="w-10 h-10 bg-purple-50 flex items-center justify-center rounded-2xl">
-                                <i class="ph-fill ph-currency-eth text-purple-500 text-xl"></i>
+                                class="w-8 h-8 bg-purple-50 flex items-center justify-center rounded-xl">
+                                <i class="ph-fill ph-currency-eth text-purple-500 text-lg"></i>
                             </div>
-                            <span id="receive-currency" class="font-bold">ETH</span>
+                            <span id="receive-currency" class="font-bold text-sm">ETH</span>
                         </div>
                         <input id="receive-input" type="number" readonly value="0.45"
-                            class="w-24 text-right font-extrabold outline-none bg-transparent text-gray-500">
+                            class="w-20 text-right font-extrabold outline-none bg-transparent text-gray-500 text-sm">
                     </div>
                 </div>
 
-                <div class="pt-4">
+                <div class="pt-3">
                     <button id="main-swap-action"
-                        class="w-full primary-purple text-white py-5 rounded-3xl font-extrabold shadow-xl shadow-purple-100 hover:opacity-95 transition-all active:scale-95">
+                        class="w-full primary-purple text-white py-3 rounded-2xl font-extrabold shadow-lg shadow-purple-100 hover:opacity-95 transition-all active:scale-95 text-sm">
                         Swap Now
                     </button>
-                    <p class="text-center text-[10px] text-gray-400 mt-4 font-bold uppercase tracking-widest">Minimal
-                        swap amount: 50 USDT</p>
+                    <p class="text-center text-[9px] text-gray-400 mt-2 font-bold uppercase tracking-wider">Minimal swap: 50 USDT</p>
                 </div>
             </div>
         </div>
 
         <!-- Market Stats Widget -->
-        <div class="mt-10 bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm">
-            <div class="flex items-center justify-between mb-6">
-                <h4 class="font-bold">Market Stats</h4>
-                <i class="ph-bold ph-dots-three-outline font-bold text-gray-400 cursor-pointer"></i>
+        <div class="mt-4 bg-white border border-gray-100 rounded-[2rem] p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-4">
+                <h4 class="font-bold text-sm">Market Stats</h4>
+                <i class="ph-bold ph-dots-three-outline font-bold text-gray-400 cursor-pointer text-sm"></i>
             </div>
-            <div class="space-y-6">
+            <div class="space-y-4">
                 <div class="flex items-center justify-between">
-                    <span class="text-gray-400 text-sm font-medium">Market Cap</span>
-                    <span class="font-bold">$2.1T</span>
+                    <span class="text-gray-400 text-xs font-medium">Market Cap</span>
+                    <span class="font-bold text-sm">$2.1T</span>
                 </div>
                 <div class="flex items-center justify-between">
-                    <span class="text-gray-400 text-sm font-medium">24h Vol</span>
-                    <span class="font-bold">$84.5B</span>
+                    <span class="text-gray-400 text-xs font-medium">24h Vol</span>
+                    <span class="font-bold text-sm">$84.5B</span>
                 </div>
                 <div class="flex items-center justify-between">
-                    <span class="text-gray-400 text-sm font-medium">BTC Dominance</span>
-                    <span class="font-bold">51.2%</span>
+                    <span class="text-gray-400 text-xs font-medium">BTC Dominance</span>
+                    <span class="font-bold text-sm">51.2%</span>
                 </div>
             </div>
         </div>
@@ -683,11 +732,11 @@
                                 data: [65000, 66000, 65500, 67000, 68000, 69500, 69880],
                                 borderColor: '#6C5DD3',
                                 backgroundColor: 'rgba(108, 93, 211, 0.1)',
-                                borderWidth: 3,
+                                borderWidth: 2,
                                 fill: true,
                                 tension: 0.4,
                                 pointRadius: 0,
-                                pointHoverRadius: 6,
+                                pointHoverRadius: 4,
                                 pointHoverBackgroundColor: '#6C5DD3',
                                 pointHoverBorderColor: '#fff',
                                 pointHoverBorderWidth: 2
@@ -702,8 +751,8 @@
                                     backgroundColor: '#1A1D1F',
                                     titleColor: '#fff',
                                     bodyColor: '#fff',
-                                    padding: 12,
-                                    cornerRadius: 8,
+                                    padding: 8,
+                                    cornerRadius: 6,
                                     displayColors: false,
                                     callbacks: {
                                         label: function(context) {
@@ -736,13 +785,13 @@
                                 data: assetData,
                                 backgroundColor: ['#6C5DD3', '#10b981', '#3b82f6', '#f59e0b'],
                                 borderWidth: 0,
-                                hoverOffset: 10
+                                hoverOffset: 5
                             }]
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            cutout: '75%',
+                            cutout: '80%',
                             plugins: {
                                 legend: {
                                     display: true,
@@ -750,8 +799,8 @@
                                     labels: {
                                         usePointStyle: true,
                                         pointStyle: 'circle',
-                                        padding: 10,
-                                        font: { size: 10, weight: 'bold' },
+                                        padding: 8,
+                                        font: { size: 9, weight: 'bold' },
                                         generateLabels: function(chart) {
                                             const data = chart.data;
                                             return data.labels.map((label, i) => ({
@@ -767,8 +816,8 @@
                                     backgroundColor: '#1A1D1F',
                                     titleColor: '#fff',
                                     bodyColor: '#fff',
-                                    padding: 8,
-                                    cornerRadius: 6,
+                                    padding: 6,
+                                    cornerRadius: 4,
                                     callbacks: {
                                         label: function(context) {
                                             const value = context.parsed;
@@ -927,7 +976,7 @@
                 email: 'ahmed@example.com',
                 currency: 'USD',
                 language: 'English',
-                avatar: 'https://ui-avatars.com/api/?name=Ahmed&background=6C5DD3&color=fff',
+                avatar: 'https://ui-avatars.com/api/?name=Ahmed&background=6C5DD3&color=fff&size=128',
                 notifications: true,
                 twoFactor: false,
                 bio: 'Crypto enthusiast and day trader'
@@ -987,24 +1036,24 @@
                         </section>
                         
                         <!-- Advanced Charts Section -->
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                             <!-- Quick Performance Summary -->
-                            <div class="bg-white rounded-[2.5rem] p-6 border border-gray-50 shadow-sm">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-lg font-bold">Quick Performance</h3>
-                                    <span class="text-emerald-500 font-bold text-sm">+18.2% all time</span>
+                            <div class="bg-white rounded-[2rem] p-5 border border-gray-50 shadow-sm">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h3 class="text-base font-bold">Quick Performance</h3>
+                                    <span class="text-emerald-500 font-bold text-xs">+18.2% all time</span>
                                 </div>
-                                <canvas id="portfolioChart" height="80"></canvas>
+                                <canvas id="portfolioChart" height="60"></canvas>
                             </div>
 
                             <!-- Asset Allocation Chart -->
-                            <div class="bg-white rounded-[2.5rem] p-6 border border-gray-50 shadow-sm">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-lg font-bold">Asset Allocation</h3>
+                            <div class="bg-white rounded-[2rem] p-5 border border-gray-50 shadow-sm">
+                                <div class="flex justify-between items-center mb-3">
+                                    <h3 class="text-base font-bold">Asset Allocation</h3>
                                     <span class="text-xs text-gray-400 font-bold">Total: $${state.assets.reduce((acc, curr) => acc + (parseFloat(curr.amount) * curr.price), 0).toLocaleString()}</span>
                                 </div>
                                 <div class="flex items-center justify-center">
-                                    <canvas id="allocationChart" height="80"></canvas>
+                                    <canvas id="allocationChart" height="60"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -1564,10 +1613,10 @@
                 avatarPreview.src = state.userProfile.avatar;
             }
 
-            // Update profile button in header
+            // Update profile button in header - show full name instead of abbreviation
             const profileName = $('#header-profile-name');
             if (profileName) {
-                profileName.innerText = state.userProfile.name.split(' ').map(n => n[0]).join('.') + '.';
+                profileName.innerText = state.userProfile.name;
             }
 
             // Update profile image in header
@@ -1719,12 +1768,12 @@
                         rightColumn.style.transform = 'translateX(0)';
                         rightColumn.style.opacity = '1';
                         rightColumn.style.pointerEvents = 'auto';
-                        if (wrapper) wrapper.classList.add('mr-96');
+                        if (wrapper) wrapper.classList.add('mr-80');
                     } else {
                         rightColumn.style.transform = 'translateX(100%)';
                         rightColumn.style.opacity = '0';
                         rightColumn.style.pointerEvents = 'none';
-                        if (wrapper) wrapper.classList.remove('mr-96');
+                        if (wrapper) wrapper.classList.remove('mr-80');
                     }
                     rightColumn.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
                 }
