@@ -1878,16 +1878,16 @@
                 // Initialize charts for specific views
                 if (viewId === 'home') {
                     setTimeout(() => {
-                        destroyCharts();
-                        initializeCharts();
+                        if (typeof destroyCharts === 'function') destroyCharts();
+                        if (typeof initializeCharts === 'function') initializeCharts();
                     }, 100);
                 } else if (viewId === 'assets') {
                     setTimeout(() => {
-                        destroyCharts();
-                        initializeAssetComparisonChart();
+                        if (typeof destroyCharts === 'function') destroyCharts();
+                        if (typeof initializeAssetComparisonChart === 'function') initializeAssetComparisonChart();
                     }, 100);
                 } else {
-                    destroyCharts();
+                    if (typeof destroyCharts === 'function') destroyCharts();
                 }
 
                 // Update Nav State
@@ -1932,12 +1932,16 @@
         }
 
         function animateHeroChart() {
-            const chartPath = $('#home-chart-path');
-            if (!chartPath) return;
-            chartPath.style.strokeDasharray = '1000';
-            chartPath.style.strokeDashoffset = '1000';
-            chartPath.style.transition = 'stroke-dashoffset 2s ease-in-out';
-            setTimeout(() => chartPath.style.strokeDashoffset = '0', 100);
+            try {
+                const chartPath = $('#home-chart-path');
+                if (!chartPath) return;
+                chartPath.style.strokeDasharray = '1000';
+                chartPath.style.strokeDashoffset = '1000';
+                chartPath.style.transition = 'stroke-dashoffset 2s ease-in-out';
+                setTimeout(() => chartPath.style.strokeDashoffset = '0', 100);
+            } catch (e) {
+                console.error('Error animating hero chart:', e);
+            }
         }
 
         // --- Toast System ---
