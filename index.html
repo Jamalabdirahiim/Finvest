@@ -1703,12 +1703,12 @@
                         rightColumn.style.transform = 'translateX(0)';
                         rightColumn.style.opacity = '1';
                         rightColumn.style.pointerEvents = 'auto';
-                        if (wrapper) wrapper.style.marginRight = '20rem';
+                        if (wrapper) wrapper.classList.add('mr-80');
                     } else {
                         rightColumn.style.transform = 'translateX(100%)';
                         rightColumn.style.opacity = '0';
                         rightColumn.style.pointerEvents = 'none';
-                        if (wrapper) wrapper.style.marginRight = '0';
+                        if (wrapper) wrapper.classList.remove('mr-80');
                     }
                     rightColumn.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
                 }
